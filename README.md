@@ -7,7 +7,8 @@ This article gives a quick tour of how to handle date/time, time zones and durat
 ### Content
 - [What is "datetime"?](#whatisdatetime)
 - [Give me date and time now!](#givemedateandtimenow)
-- [From string and to string](#fromstringandtostring)
+- [From string](#fromstring)
+- [To string](#andtostring)
 - [Setting UTC and time zones](#settingutcandtimezones)
 - [Unix time](#unixtime)
 - [Durations: timedelta](#durationstimedelta)
@@ -17,7 +18,7 @@ This article gives a quick tour of how to handle date/time, time zones and durat
 
 
 ### What is "datetime"?
-In the context of this article, datetime is a data structure to hold information on date and time, based on a certain calendar. In Python, you have [class datetime](https://docs.python.org/3/library/datetime.html#datetime-objects) from the [datetime module](https://docs.python.org/3/library/datetime.html) (standard library) for that purpose.
+In the context of this article, datetime is a data structure to hold information on date and time, based on a certain calendar. In Python, you have [class datetime](https://docs.python.org/3/library/datetime.html#datetime-objects) from the [datetime module](https://docs.python.org/3/library/datetime.html) (standard library) for that purpose. It uses the [Gregorian calendar](https://en.wikipedia.org/wiki/Gregorian_calendar) we're all used to.
 
 
 ### Give me date and time now!
@@ -28,16 +29,16 @@ from datetime import datetime
 now = datetime.now()
 print(now)
 # prints the string representation of the datetime object, for example
-# 
+# 2021-10-05 19:32:04.898003
 
 # or with a bit of formatting:
 print(f"the current time is {now.time()}, on {now.date()}")
-# 
+# the current time is 19:32:04.898003, on 2021-10-05
 ```
 `now` is what you would see on your wall clock. If you inspect closer,
 ```Python
 print(repr(now))
-#
+# datetime.datetime(2021, 10, 5, 19, 32, 4, 898003)
 ```
 you see that the object has no time zone specified, it's just the time your operating system is configured to use. The `datetime` object is said to be [naïve](https://docs.python.org/3/library/datetime.html#aware-and-naive-objects). Computers are ubiquitous all around the world, in many different time zones - so if you'd want something "universal", you can write
 ```Python
@@ -45,9 +46,9 @@ from datetime import timezone
 
 now_utc = datetime.now(timezone.utc)
 print(now_utc)
-#
+# 2021-10-05 17:32:04.898176+00:00
 print(repr(now_utc))
-# 
+# datetime.datetime(2021, 10, 5, 17, 32, 4, 898176, tzinfo=datetime.timezone.utc)
 ```
 But before we dive into time zones, let's discuss how you can get a string that shows date and time. And of course the other way around, how you get a `datetime` object from a string of characters.
 
@@ -60,13 +61,13 @@ To get a string converted to datetime, just tell the computer what to do by sele
 s = "10/14/1986 18:00"
 dt = datetime.strptime(s, "%m/%d/%Y %H:%M")
 print(repr(dt))
-#
+# datetime.datetime(1986, 10, 14, 18, 0)
 
 # or another one, just time in AM/PM format:
 s = "9:15 PM"
 dt = datetime.strptime(s, "%I:%M %p")
 print(repr(dt))
-#
+# datetime.datetime(1900, 1, 1, 21, 15)
 # note that a default date was added
 ```
 All units of date and time have to be matched by a directive `%...` while all other characters have to be exactly as in the input. For example
@@ -85,17 +86,17 @@ Since 3.7, Python's standard library offers to parse [ISO 8601](https://en.wikip
 s = "2020-07-30T13:17:00.333+03:00"
 dt = datetime.fromisoformat(s)
 print(repr(dt))
-#
+# datetime.datetime(2020, 7, 30, 13, 17, 0, 333000, tzinfo=datetime.timezone(datetime.timedelta(seconds=10800)))
 
 # UTC offset of zero hours is parsed to UTC:
 s = "1970-01-01T12:18:00+00:00"
 dt = datetime.fromisoformat(s)
 print(repr(dt))
-# 
+# datetime.datetime(1970, 1, 1, 12, 18, tzinfo=datetime.timezone.utc)
 ```
 
 ***pitfall: %Z vs. UTC or GMT***
-There is a parsing directive `%Z` that can make strptime accept `"GMT"` and `"UTC"`. However, the information (this date/time is UTC!) is actually ignored:
+There is a parsing directive `%Z` (capital letter Z) that can make strptime accept `"GMT"` and `"UTC"`. However, the information (this date/time is UTC!) is actually ignored:
 ```Python
 s = "10.14.1986 9:15 PM GMT"
 dt = datetime.strptime(s, "%m.%d.%Y %I:%M %p %Z")
@@ -112,19 +113,19 @@ print(repr(dt))
 ### ...and to string
 Same directives work the other way around, e.g.
 ```Python
-print("the current time is", datetime.now().strftime("%I:%M %p"))
-# 
+print("the current time is", datetime.now().strftime("%I:%M %p").upper())
+# the current time is 07:47 PM
 
 # or even
 print(datetime.now().strftime("today is %A, %B %Y"))
-#
+# today is Tuesday, October 2021
 ```
 Convenient is also [isoformat](https://docs.python.org/3/library/datetime.html#datetime.datetime.isoformat),
 ```Python
-print(datetime.now(timezone.utc).isoformat(timespec="milliseconds")
-# 
+print(datetime.now(timezone.utc).isoformat(timespec="milliseconds"))
+# 2021-10-05T17:50:34.972+00:00
 ```
-...although this might not be considered "readable" by the typical human, computers (and programmers) will like it.
+...although this might not be considered "readable" by the typical human, computers (and programmers) will like it. See [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) and [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) for more info.
 
 
 
