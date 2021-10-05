@@ -133,17 +133,17 @@ print(datetime.now(timezone.utc).isoformat(timespec="milliseconds"))
 ### Setting UTC and time zones
 The intro section already shows how to set UTC. What about other time zones?
 
-zoneinfo example
+> todo >> zoneinfo example
 
-time zone definitions change over time - how is the tz database kept up-to-date?
+> todo >> time zone definitions change over time - how is the tz database kept up-to-date?
 
 
 ### Unix time
-from Unix time to datetime and back
+> todo >> from Unix time to datetime and back
 
 
 ### Durations: timedelta
-wall time example
+> todo >> wall time example
 
 
 ### Do's and Don'ts
