@@ -5,15 +5,15 @@ This article gives a quick tour of how to handle date/time, time zones and durat
 
 
 ### Content
-- [What is "datetime"?](#whatisdatetime)
-- [Give me date and time now!](#givemedateandtimenow)
-- [From string](#fromstring)
-- [To string](#andtostring)
-- [Setting UTC and time zones](#settingutcandtimezones)
-- [Unix time](#unixtime)
-- [Durations: timedelta](#durationstimedelta)
-- [Do's and Don'ts](#dosanddonts)
-- [Third party packages](#usefulthirdpartypackages)
+- [What is "datetime"?](#what-is-datetime)
+- [Give me date and time now!](#give-me-date-and-time-now)
+- [From string](#from-string)
+- [To string](#and-to-string)
+- [Setting UTC and time zones](#setting-utc-and-time-zones)
+- [Unix time](#unix-time)
+- [Durations: timedelta](#durations-timedelta)
+- [Do's and Don'ts](#dos-and-donts)
+- [Useful third party packages](#useful-third-party-packages)
 - [About](#about)
 
 
