@@ -148,7 +148,7 @@ The intro section already shows how to set UTC. What about other time zones?
 
 ### Do's and Don'ts
 - Better avoid [utcnow](https://docs.python.org/3/library/datetime.html#datetime.datetime.utcnow) and [utcfromtimestamp](https://docs.python.org/3/library/datetime.html#datetime.datetime.utcfromtimestamp). Why? Both return naïve datetime objects while the name clearly indicates something else - UTC! That is simply misleading in my opinion and can cause nasty, unexpected results.
-- [pytz](https://pythonhosted.org/pytz/) should be considered legacy and not used anymore in new projects. There is a [deprecation shim](https://github.com/pganssle/pytz-deprecation-shim) for older projects that have to rely on this dependency for some reason.
+- [pytz](https://pythonhosted.org/pytz/) should be considered legacy and not used anymore in new projects. There is a [deprecation shim](https://github.com/pganssle/pytz-deprecation-shim) for older projects that have to rely on this dependency for some reason. For older Python versions, there's [dateutil.tz](https://dateutil.readthedocs.io/en/stable/tz.html) which uses the same semantics as `zoneinfo` or [backports.zoneinfo](https://pypi.org/project/backports.zoneinfo/).
 
 
 ### Useful third party packages
