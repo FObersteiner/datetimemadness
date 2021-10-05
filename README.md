@@ -152,10 +152,10 @@ wall time example
 
 
 ### Useful third party packages
-- dateutil
-- tzlocal
-- timezonefinder
-- whereareyou
+- [dateutil](https://github.com/dateutil/dateutil) - powerful extension to the standard lib's `datetime`, for example with a great universal [parser](https://dateutil.readthedocs.io/en/stable/parser.html), [relativedelta](https://dateutil.readthedocs.io/en/stable/relativedelta.html) and more.
+- [tzlocal](https://github.com/regebro/tzlocal) - tries to figure out what your local timezone is.
+- [timezonefinder](https://github.com/jannikmi/timezonefinder) - finds the time zone at any point on earth (offline).
+- [whereareyou](https://github.com/MrFuppes/whenareyou) - use Uses nominatim.openstreetmap.org to find the time zone of a given location name (e.g. a city).
 
 
 ### About
