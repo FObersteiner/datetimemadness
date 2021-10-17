@@ -1,7 +1,7 @@
 # A 2021 tour of datetime, time zones and timedelta in Python
 > ***if you don't set a time zone, it's local time!***
 
-This article gives a quick tour of how to handle date/time, time zones and durations in Python 3.9 and higher. It should help you to avoid the common pitfalls I've encountered personally and in many questions around the subject on [stackoverflow](https://stackoverflow.com/).
+This article gives a quick tour of how to handle date/time, time zones and durations in Python 3.9 and higher. It should give you an overview of what you can do and what tools there are. And of course help you avoid the common pitfalls I've encountered personally and in many questions around the subject on [stackoverflow](https://stackoverflow.com/).
 
 
 
@@ -10,11 +10,11 @@ This article gives a quick tour of how to handle date/time, time zones and durat
 - [Give me date and time now!](#give-me-date-and-time-now)
 - [From string](#from-string)
 - [To string](#and-to-string)
-- [Setting time zones](#setting-time-zones-and-converting-between-them)
+- [Time zones](#setting-time-zones-and-converting-between-them)
 - [UNIX time](#unix-time)
 - [Durations: timedelta](#durations-timedelta)
 - [Do's and Don'ts](#dos-and-donts)
-- [Useful third party packages](#useful-third-party-packages)
+- [Useful third party packages etc.](#useful-packages-etc)
 - [About](#about)
 
 
@@ -33,14 +33,14 @@ now = datetime.now()
 print(now) # prints the string representation of the datetime object
 # 2021-10-05 19:32:04.898003
 ```
-`now` is what you would see on your wall clock, although it probably doesn't show microseconds. 
+`now` is what you would see on your "wall clock" (i.e. your computer's clock display), although it probably doesn't show microseconds. 
 
 If you inspect closer,
 ```Python
 print(repr(now))
 # datetime.datetime(2021, 10, 5, 19, 32, 4, 898003)
 ```
-you see that the object has no time zone specified, it's just the time your operating system is configured to use. The `datetime` object is said to be [naïve](https://docs.python.org/3/library/datetime.html#aware-and-naive-objects). Computers are ubiquitous all around the world, in many different time zones - so if you'd want something "universal", you can write
+you see that it's just the time your operating system is configured to use, without saying anything about the time zone. The `datetime` object is said to be [naïve](https://docs.python.org/3/library/datetime.html#aware-and-naive-objects). Computers are ubiquitous all around the world, in many different time zones - so if you'd want something "universal", you can write
 ```Python
 from datetime import timezone
 
@@ -50,7 +50,7 @@ print(now_utc)
 print(repr(now_utc))
 # datetime.datetime(2021, 10, 5, 17, 32, 4, 898176, tzinfo=datetime.timezone.utc)
 ```
-But before we dive into time zones, let's discuss how you get a `datetime` object from a string of characters. And of course the other way around, how you can get a string that shows date and time in a "human-readable" way.
+But before we dive into time zones, let's discuss how you get a `datetime` object from a string of characters. And of course the other way around, how you can get a string that shows date and time in a certain format.
 
 
 
@@ -96,7 +96,9 @@ print(repr(dt))
 # datetime.datetime(1970, 1, 1, 12, 18, tzinfo=datetime.timezone.utc)
 ```
 
+
 ***Pitfall: %Z vs. UTC or GMT***
+
 There is a parsing directive `%Z` (capital letter Z) that can make `strptime` accept `"GMT"` and `"UTC"`. However, the information (this date/time is in UTC) is actually ignored:
 ```Python
 s = "10.14.1986 9:15 PM GMT"
@@ -106,7 +108,7 @@ print(repr(dt))
 print(dt.tzinfo)
 # None
 ``` 
-Notice that the `tzinfo` attribute of the datetime object is still `None`. That's bad because it means the datetime object is naive - so treated like *local time*. A work-around could be (notice the lower-case `%z`):
+Notice that the `tzinfo` attribute of the datetime object is still `None`. That's bad because it means the datetime object is naïve - so treated like *local time*. A work-around could be (notice the lower-case `%z`):
 ```Python
 dt = datetime.strptime(s.replace("GMT", "+00:00"), "%m.%d.%Y %I:%M %p %z")
 print(repr(dt))
@@ -176,7 +178,8 @@ print(f"current time in Germany: {now_Germany.isoformat(timespec='seconds')}")
 We came from UTC-7 to UTC+2 so the total difference between those two time zones is 9 hours.
 
 
-***I have naive datetime, how can I set a certain time zone?***
+***I have naïve datetime, how can I set a certain time zone?***
+
 With zoneinfo's timezone objects, you can easily do that by [replacing](https://docs.python.org/3/library/datetime.html#datetime.datetime.replace) the tzinfo attribute:
 ```Python
 naive = datetime(2021, 10, 17) # this should be in time zone Europe/Berlin...
@@ -194,7 +197,9 @@ print(aware)
 # 2021-10-17 00:00:00+02:00
 ```
 
+
 ***What about daylight saving time transitions?***
+
 If the time zone is set, transitions of daylight saving time (DST) are handled. For example in Germany (time zone *Europe/Berlin*), we'll transition from summer- to winter time on Oct 31st 2021:
 ```Python
 summer = datetime(2021, 10, 30, tzinfo=ZoneInfo("Europe/Berlin"))
@@ -208,28 +213,138 @@ The UTC offset changed from +2 hours during summer time to +1 hour during winter
 
 
 ***Time zone rules change over time***
+
 Time zone rules, e.g. when DST starts and ends, are subject to political decisions. So expect them to change. How is this being taken into account? Python's `zoneinfo` tries to use your system's tz database, that is e.g. provided and kept up-to-date by the `tzdata` package on UNIX systems. For systems that do not offer such time zone data (e.g. Windows), there is a first party Python package [tzdata](https://tzdata.readthedocs.io/en/latest/).
 
 
 
 ### UNIX time
-> todo >> from Unix time to datetime and back
+[Unix time](https://en.wikipedia.org/wiki/Unix_time), i.e. units of time passed since the UNIX epoch 1970-01-01 can be a very useful means to represent date and time: it is "just a number", no complicated data structure needed. Python handles it as a floating point number that represents *seconds* since the epoch by default. If you have any other unit as input (e.g. milliseconds), convert to seconds first. You can obtain it for a datetime object by the [timestamp](https://docs.python.org/3/library/datetime.html#datetime.datetime.timestamp) method:
+```Python
+from datetime import datetime, timezone
+
+now_utc = datetime.now(timezone.utc)
+print(now_utc)
+# 2021-10-17 09:40:47.170662+00:00
+
+unix = now_utc.timestamp()
+print(unix)
+# 1634463647.170662
+```
+Vice versa, [fromtimestamp](https://docs.python.org/3/library/datetime.html#datetime.datetime.fromtimestamp) does the opposite:
+```Python
+back_utc = datetime.fromtimestamp(unix, tz=timezone.utc)
+print(back_utc)
+# 2021-10-17 09:40:47.170662+00:00
+```
+
+
+***What about... "if you don't set a time zone, it's local time!"***
+
+In the `fromtimestamp` example, I deliberately set the tz argument of the method to `timezone.utc`. What happens if we omit that?
+```Python
+back = datetime.fromtimestamp(unix)
+print(back)
+# 2021-10-17 11:40:47.170662
+```
+We get a time that is 2 hours ahead and the UTC offset disappeared. +2 hours is my local time's UTC offset (time zone Europe/Berlin, Oct 2021). If we don't set a time zone, Python gives us local time as a naïve datetime object. That can be very confusing if you expect for example UTC as the default as it is in other programming languages (and even Python packages such as [pandas](https://pandas.pydata.org/)...).
+
+Same goes the other way 'round,
+```Python
+naive = datetime(2021, 10, 17) 
+print(naive)
+# 2021-10-17 00:00:00
+unix = naive.timestamp()
+print(datetime.fromtimestamp(unix, timezone.utc))
+# 2021-10-16 22:00:00+00:00
+```
+Since the Unix epoch refers to UTC, we see the local time's UTC offset appear if we convert the timestamp to an aware datetime object in UTC. To calculate the timestamp, Python in principle converts given naïve datetime to UTC, then calculates seconds since the epoch. In general, my advice would be to work with aware datetime here if you can (UTC preferred), otherwise *exclusively* work with naïve datetime, never mix the two (as I did in the example...).
 
 
 ### Durations: timedelta
-> todo >> wall time example
+In Python, the data structure to represent durations are [timedelta objects](https://docs.python.org/3/library/datetime.html#timedelta-objects) from the `datetime` library. You can create such an object by
+```Python
+from datetime import timedelta
+# set individual attributes:
+duration = timedelta(hours=1, minutes=30)
+print(duration)
+# 1:30:00
+```
+To get the total duration in seconds as a floating point number you have a very useful method [total_seconds](https://docs.python.org/3/library/datetime.html#datetime.timedelta.total_seconds):
+```Python
+print(duration.total_seconds())
+# 5400.0
+```
+`timedelta` is also returned if you subtract two datetime objects from one another:
+```Python
+from datetime import datetime
+
+duration = datetime(2020, 1, 1, 15) - datetime(2020, 1, 1, 14)
+print(duration, duration.total_seconds())
+# 1:00:00 3600.0
+```
+
+You can use that for example to calculate how many seconds of the day have passed:
+```Python
+now = datetime.now().replace(microsecond=0) # remove microseconds for clarity
+now_normalized = datetime.combine(now.date(), now.time().min) # floor the time
+
+sod = (now - now_normalized).total_seconds()
+print(now)
+# 2021-10-17 14:05:15 
+print(f"seconds passed since {now_normalized}: {sod}")
+# seconds passed since 2021-10-17 00:00:00: 50715.0
+```
+or convert seconds of day into a datetime object:
+```Python
+dt = datetime(2021, 10, 17) + timedelta(seconds=sod)
+print(dt)
+# 2021-10-17 14:05:15
+```
+
+***timedelta and wall time***
+
+Remember from the time zone section, there is a DST transition from summer to winter time between those dates:
+```Python
+from zoneinfo import ZoneInfo
+
+summer = datetime(2021, 10, 30, tzinfo=ZoneInfo("Europe/Berlin"))
+winter = datetime(2021, 11, 1, tzinfo=ZoneInfo("Europe/Berlin"))
+```
+So in our physical reality, 2 days and one extra hour have passed in-between those dates. But if we look at the timedelta,
+```Python
+print(winter-summer)
+# 2 days, 0:00:00
+```
+it shows us the difference that our wall clock would show us. The wall clock is of course *adjusted* to the DST transition, i.e. turned backwards one hour in this case. If we convert both datetime objects to UTC, the "lost" hour re-appears, since UTC has no DST:
+```Python
+UTC = ZoneInfo("UTC")
+utc_summer, utc_winter = summer.astimezone(UTC), winter.astimezone(UTC)
+print(utc_winter-utc_summer)
+# 2 days, 1:00:00
+```
+
+***Limits***
+
+Unfortunately, there's no `strptime` or `strftime` methods that return timedelta objects, so if you want to convert to and from string, you'll have to come up with something by yourself. I've created an [example for each direction here](https://github.com/MrFuppes/pydatetimetut/blob/main/src/04_timedelta.py).
+
+A "normal" day has 24 hours, a "normal" week has 7 days - but what about months? It could have 28 to 31 days, so a month is an ambiguous quantity. You can't represent it as a `timedelta` object. But there's dateutil's [relativedelta](https://dateutil.readthedocs.io/en/stable/relativedelta.html) in case you want to go beyond a week's duration.
 
 
-### Do's and Don'ts
+
+
+### Dos and Don'ts
 - Better avoid [utcnow](https://docs.python.org/3/library/datetime.html#datetime.datetime.utcnow) and [utcfromtimestamp](https://docs.python.org/3/library/datetime.html#datetime.datetime.utcfromtimestamp). Why? Both return naïve datetime objects while the name clearly indicates something else - UTC! That is simply misleading in my opinion and can cause nasty, unexpected results.
-- [pytz](https://pythonhosted.org/pytz/) should be considered legacy and not used anymore in new projects. There is a [deprecation shim](https://github.com/pganssle/pytz-deprecation-shim) for older projects that have to rely on this dependency for some reason. For older Python versions, there's [dateutil.tz](https://dateutil.readthedocs.io/en/stable/tz.html) which uses the same semantics as `zoneinfo` or [backports.zoneinfo](https://pypi.org/project/backports.zoneinfo/).
+- [pytz](https://pythonhosted.org/pytz/) can be considered legacy and not should not be used anymore in new projects. There is a [deprecation shim](https://github.com/pganssle/pytz-deprecation-shim) for older projects that have to rely on this dependency for some reason. For older Python versions, there's [dateutil.tz](https://dateutil.readthedocs.io/en/stable/tz.html) which uses the same semantics as `zoneinfo` or [backports.zoneinfo](https://pypi.org/project/backports.zoneinfo/).
 
 
-### Useful third party packages
+### Useful packages etc.
 - [dateutil](https://github.com/dateutil/dateutil) - powerful extension to the standard lib's `datetime`, for example with a great universal [parser](https://dateutil.readthedocs.io/en/stable/parser.html), [relativedelta](https://dateutil.readthedocs.io/en/stable/relativedelta.html) and more.
 - [tzlocal](https://github.com/regebro/tzlocal) - tries to figure out what your local timezone is.
 - [timezonefinder](https://github.com/jannikmi/timezonefinder) - finds the time zone at any point on earth (offline).
-- [whereareyou](https://github.com/MrFuppes/whenareyou) - use Uses nominatim.openstreetmap.org to find the time zone of a given location name (e.g. a city).
+- [eggert/tz](https://github.com/eggert/tz) - Paul Eggert's time zone database, if you want to dive into time zone rules.
+- [whereareyou](https://github.com/MrFuppes/whenareyou) - use nominatim.openstreetmap.org to find the time zone of a given location name (e.g. a city).
+
 
 
 ### About
