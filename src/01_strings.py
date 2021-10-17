@@ -60,12 +60,17 @@ s = "10.14.1986 9:15 PM GMT"
 dt = datetime.strptime(s, "%m.%d.%Y %I:%M %p %Z")
 print(repr(dt))
 # datetime.datetime(1986, 10, 14, 21, 15) # GMT is lost!
+print(dt.tzinfo)
+# None
 
 dt = datetime.strptime(s.replace("GMT", "+00:00"), "%m.%d.%Y %I:%M %p %z")
 print(repr(dt))
 # datetime.datetime(1986, 10, 14, 21, 15, tzinfo=datetime.timezone.utc)
 
-
+s = "10.14.1986 9:15 PM GMT+02:00"
+dt = datetime.strptime(s, "%m.%d.%Y %I:%M %p %Z%z") # datetime.strptime(s, "%m.%d.%Y %I:%M %p GMT%z")
+print(repr(dt))
+# datetime.datetime(1986, 10, 14, 21, 15, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'GMT'))
 
 # -----------------------------------------------------------------------------
 # basics, datetime to string
@@ -74,7 +79,7 @@ print("the current time is", datetime.now().strftime("%I:%M %p").upper())
 # the current time is 07:47 PM
 
 # or even
-print(datetime.now().strftime("today is %A, %B %Y"))
+print("today is", datetime.now().strftime("%A, %B %Y"))
 # today is Tuesday, October 2021
 
 print(datetime.now(timezone.utc).isoformat(timespec="milliseconds"))
