@@ -1,11 +1,11 @@
 # A 2021 tour of datetime, time zones and timedelta in Python
 > ***if you don't set a time zone, it's local time!***
 
-This article gives a quick tour of how to handle date/time, time zones and durations in Python 3.9 and higher. It should give you an overview of what you can do and what tools there are. And of course help you avoid the common pitfalls I've encountered personally and in many questions around the subject on [stackoverflow](https://stackoverflow.com/).
+This manuscript gives a quick tour of how to handle date/time, time zones and durations in Python 3.9 and higher. It gives you an overview of what you can do and what tools there are. And of course helps you to avoid the common pitfalls I've encountered personally and in many questions around the subject on [stackoverflow](https://stackoverflow.com/).
 
 
 
-### Content
+### Overview
 - [What is "datetime"?](#what-is-datetime)
 - [Give me date and time now!](#give-me-date-and-time-now)
 - [From string](#from-string)
@@ -17,12 +17,12 @@ This article gives a quick tour of how to handle date/time, time zones and durat
 - [Useful third party packages etc.](#useful-packages-etc)
 - [About](#about)
 
-
+---
 
 ### What is "datetime"?
-In the context of this article, datetime is a data structure to hold information on date and time, based on a certain calendar. In Python, you have [class datetime](https://docs.python.org/3/library/datetime.html#datetime-objects) from the [datetime module](https://docs.python.org/3/library/datetime.html) (standard library) for that purpose. It uses the [Gregorian calendar](https://en.wikipedia.org/wiki/Gregorian_calendar) we're all used to.
+In the context of this manuscript, datetime is a data structure to hold information on date and time, based on a certain calendar. In Python, you have `class` [datetime](https://docs.python.org/3/library/datetime.html#datetime-objects) from the [datetime module](https://docs.python.org/3/library/datetime.html) (standard library) for that purpose. It uses the [Gregorian calendar](https://en.wikipedia.org/wiki/Gregorian_calendar) we're used to (I suppose).
 
-
+---
 
 ### Give me date and time now!
 To get the current time, you write
@@ -52,10 +52,10 @@ print(repr(now_utc))
 ```
 But before we dive into time zones, let's discuss how you get a `datetime` object from a string of characters. And of course the other way around, how you can get a string that shows date and time in a certain format.
 
-
+---
 
 ### From string
-In Python, you **p**arse a string to a `datetime` object with the [str**p**time](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior) method, and you create a string that shows date/time in a certain **f**ormat with the [str**f**time](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior) method. To be precise with wording, only the text in a string can have a certain *format*, not the `datetime` object itself since it's a data structure.
+It is pretty common to store date/time as a string. In Python, you **p**arse a string to a `datetime` object with the [str**p**time](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior) method, and you create a string that shows date/time in a certain **f**ormat with the [str**f**time](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior) method. To be precise with wording, only the text in a string can have a certain *format*, not the `datetime` object itself since it's a data structure.
 
 To get a string converted to datetime, just tell the computer what to do by selecting from [strftime() and strptime() Format Codes](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes):
 ```Python
@@ -99,7 +99,7 @@ print(repr(dt))
 
 ***Pitfall: %Z vs. UTC or GMT***
 
-There is a parsing directive `%Z` (capital letter Z) that can make `strptime` accept `"GMT"` and `"UTC"`. However, the information (this date/time is in UTC) is actually ignored:
+There is a parsing directive `%Z` (capital letter Z) that can make `strptime` accept `"GMT"` and `"UTC"`. However, the information ("this date/time is in UTC") is actually ignored:
 ```Python
 s = "10.14.1986 9:15 PM GMT"
 dt = datetime.strptime(s, "%m.%d.%Y %I:%M %p %Z")
@@ -121,8 +121,9 @@ dt = datetime.strptime(s, "%m.%d.%Y %I:%M %p %Z%z")
 print(repr(dt))
 # datetime.datetime(1986, 10, 14, 21, 15, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'GMT'))
 ```
-A parsing directive of `"%m.%d.%Y %I:%M %p GMT%z"` would have worked as well though, the tzinfo attribute just wouldn't have a name.
+A parsing directive of `"%m.%d.%Y %I:%M %p GMT%z"` would have worked as well though, the tzinfo attribute just wouldn't have a name then.
 
+---
 
 ### ...and to string
 Same directives work the other way around. Just tell the computer what to do, e.g.
@@ -134,14 +135,14 @@ print("the current time is", datetime.now().strftime("%I:%M %p"))
 print("today is", datetime.now().strftime("%A, %B %Y"))
 # today is Tuesday, October 2021
 ```
-Convenient is also the [isoformat](https://docs.python.org/3/library/datetime.html#datetime.datetime.isoformat) method,
+The [isoformat](https://docs.python.org/3/library/datetime.html#datetime.datetime.isoformat) method is also convenient,
 ```Python
 print(datetime.now(timezone.utc).isoformat(timespec="milliseconds"))
 # 2021-10-05T17:50:34.972+00:00
 ```
 ...although this might not be considered "readable" by the typical human, computers (and programmers) will like it. See [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) and [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) for more info.
 
-
+---
 
 ### Setting time zones and converting between them
 The intro section already shows how to set UTC. What about other time zones?
@@ -163,13 +164,13 @@ print(now_Pacific.tzinfo, now_Pacific.utcoffset())
 ```
 the "-1 day, 17:00:00" is kind of cryptic but can be resolved as `-1 day = -24 hours`, `17:00:00 = +17 hours`, so `-7 hours` in sum. LA was 7 hours behind UTC on Oct 17th 2021.
 
-We can also observe that if we convert to UTC with the [astimezone](https://docs.python.org/3/library/datetime.html#datetime.datetime.astimezone) method:
+We also observe that if we convert to UTC with the [astimezone](https://docs.python.org/3/library/datetime.html#datetime.datetime.astimezone) method:
 ```Python
 now_UTC = now_Pacific.astimezone(ZoneInfo("UTC"))
 print(f"current UTC time: {now_UTC.isoformat(timespec='seconds')}")
 # current UTC time: 2021-10-17T08:19:22+00:00
 ```
-We can also convert to another time zone; observe how the time changes from 1 am to 10 am and the UTC offset is now 2 hours ahead of UTC:
+Furthermore, we can convert to another time zone; observe how the time changes from 1 am to 10 am and the UTC offset is now 2 hours ahead of UTC:
 ```Python
 now_Germany = now_Pacific.astimezone(ZoneInfo("Europe/Berlin"))
 print(f"current time in Germany: {now_Germany.isoformat(timespec='seconds')}")
@@ -197,7 +198,6 @@ print(aware)
 # 2021-10-17 00:00:00+02:00
 ```
 
-
 ***What about daylight saving time transitions?***
 
 If the time zone is set, transitions of daylight saving time (DST) are handled. For example in Germany (time zone *Europe/Berlin*), we'll transition from summer- to winter time on Oct 31st 2021:
@@ -216,7 +216,7 @@ The UTC offset changed from +2 hours during summer time to +1 hour during winter
 
 Time zone rules, e.g. when DST starts and ends, are subject to political decisions. So expect them to change. How is this being taken into account? Python's `zoneinfo` tries to use your system's tz database, that is e.g. provided and kept up-to-date by the `tzdata` package on UNIX systems. For systems that do not offer such time zone data (e.g. Windows), there is a first party Python package [tzdata](https://tzdata.readthedocs.io/en/latest/).
 
-
+---
 
 ### UNIX time
 [Unix time](https://en.wikipedia.org/wiki/Unix_time), i.e. units of time passed since the UNIX epoch 1970-01-01 can be a very useful means to represent date and time: it is "just a number", no complicated data structure needed. Python handles it as a floating point number that represents *seconds* since the epoch by default. If you have any other unit as input (e.g. milliseconds), convert to seconds first. You can obtain it for a datetime object by the [timestamp](https://docs.python.org/3/library/datetime.html#datetime.datetime.timestamp) method:
@@ -238,7 +238,6 @@ print(back_utc)
 # 2021-10-17 09:40:47.170662+00:00
 ```
 
-
 ***What about... "if you don't set a time zone, it's local time!"***
 
 In the `fromtimestamp` example, I deliberately set the tz argument of the method to `timezone.utc`. What happens if we omit that?
@@ -247,7 +246,7 @@ back = datetime.fromtimestamp(unix)
 print(back)
 # 2021-10-17 11:40:47.170662
 ```
-We get a time that is 2 hours ahead and the UTC offset disappeared. +2 hours is my local time's UTC offset (time zone Europe/Berlin, Oct 2021). If we don't set a time zone, Python gives us local time as a naïve datetime object. That can be very confusing if you expect for example UTC as the default as it is in other programming languages (and even Python packages such as [pandas](https://pandas.pydata.org/)...).
+We get a time that is 2 hours ahead and the UTC offset disappeared. +2 hours is my current local time's UTC offset. If we don't set a time zone, Python gives us local time as a naïve datetime object. That can be very confusing if you expect for example UTC as the default as it is in other programming languages (and even Python packages such as [pandas](https://pandas.pydata.org/)...).
 
 Same goes the other way 'round,
 ```Python
@@ -260,6 +259,7 @@ print(datetime.fromtimestamp(unix, timezone.utc))
 ```
 Since the Unix epoch refers to UTC, we see the local time's UTC offset appear if we convert the timestamp to an aware datetime object in UTC. To calculate the timestamp, Python in principle converts given naïve datetime to UTC, then calculates seconds since the epoch. In general, my advice would be to work with aware datetime here if you can (UTC preferred), otherwise *exclusively* work with naïve datetime, never mix the two (as I did in the example...).
 
+---
 
 ### Durations: timedelta
 In Python, the data structure to represent durations are [timedelta objects](https://docs.python.org/3/library/datetime.html#timedelta-objects) from the `datetime` library. You can create such an object by
@@ -330,13 +330,13 @@ Unfortunately, there's no `strptime` or `strftime` methods that return timedelta
 
 A "normal" day has 24 hours, a "normal" week has 7 days - but what about months? It could have 28 to 31 days, so a month is an ambiguous quantity. You can't represent it as a `timedelta` object. But there's dateutil's [relativedelta](https://dateutil.readthedocs.io/en/stable/relativedelta.html) in case you want to go beyond a week's duration.
 
-
-
+---
 
 ### Dos and Don'ts
 - Better avoid [utcnow](https://docs.python.org/3/library/datetime.html#datetime.datetime.utcnow) and [utcfromtimestamp](https://docs.python.org/3/library/datetime.html#datetime.datetime.utcfromtimestamp). Why? Both return naïve datetime objects while the name clearly indicates something else - UTC! That is simply misleading in my opinion and can cause nasty, unexpected results.
 - [pytz](https://pythonhosted.org/pytz/) can be considered legacy and not should not be used anymore in new projects. There is a [deprecation shim](https://github.com/pganssle/pytz-deprecation-shim) for older projects that have to rely on this dependency for some reason. For older Python versions, there's [dateutil.tz](https://dateutil.readthedocs.io/en/stable/tz.html) which uses the same semantics as `zoneinfo` or [backports.zoneinfo](https://pypi.org/project/backports.zoneinfo/).
 
+---
 
 ### Useful packages etc.
 - [dateutil](https://github.com/dateutil/dateutil) - powerful extension to the standard lib's `datetime`, for example with a great universal [parser](https://dateutil.readthedocs.io/en/stable/parser.html), [relativedelta](https://dateutil.readthedocs.io/en/stable/relativedelta.html) and more.
@@ -345,7 +345,7 @@ A "normal" day has 24 hours, a "normal" week has 7 days - but what about months?
 - [eggert/tz](https://github.com/eggert/tz) - Paul Eggert's time zone database, if you want to dive into time zone rules.
 - [whereareyou](https://github.com/MrFuppes/whenareyou) - use nominatim.openstreetmap.org to find the time zone of a given location name (e.g. a city).
 
-
+---
 
 ### About
 Why did this topic catch my interest? In our day-to-day life, date and time can be pretty weird things. Just think about how countries change daylight saving times as they see fit. Maybe convenient for the locals. But very confusing to foreign people happening to travel there! Now computers should handle this?! They're not known to be very political - more weird stuff to be expected! Find [me on stackoverflow](https://stackoverflow.com/users/10197418/mrfuppes) looking for such things.
