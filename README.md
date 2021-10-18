@@ -33,7 +33,7 @@ now = datetime.now()
 print(now) # prints the string representation of the datetime object
 # 2021-10-05 19:32:04.898003
 ```
-`now` is what you would see on your "wall clock" (i.e. your computer's clock display), although it probably doesn't show microseconds. 
+`now` is what you would see on your "wall clock" (i.e. your computer's clock display), although it probably doesn't show microseconds.
 
 If you inspect closer,
 ```Python
@@ -76,7 +76,7 @@ All units of date and time have to be matched by a directive `%...` while all ot
 s = "10.14.1986"
 dt = datetime.strptime(s, "%m/%d/%Y")
 ```
-will fail with 
+will fail with
 > ValueError: time data '10.14.1986' does not match format '%m/%d/%Y'
 
 because I used the wrong delimiter, `/` should be `.`
@@ -107,7 +107,7 @@ print(repr(dt))
 # datetime.datetime(1986, 10, 14, 21, 15)
 print(dt.tzinfo)
 # None
-``` 
+```
 Notice that the `tzinfo` attribute of the datetime object is still `None`. That's bad because it means the datetime object is naïve - so treated like *local time*. A work-around could be (notice the lower-case `%z`):
 ```Python
 dt = datetime.strptime(s.replace("GMT", "+00:00"), "%m.%d.%Y %I:%M %p %z")
@@ -250,7 +250,7 @@ We get a time that is 2 hours ahead and the UTC offset disappeared. +2 hours is 
 
 Same goes the other way 'round,
 ```Python
-naive = datetime(2021, 10, 17) 
+naive = datetime(2021, 10, 17)
 print(naive)
 # 2021-10-17 00:00:00
 unix = naive.timestamp()
@@ -291,7 +291,7 @@ now_normalized = datetime.combine(now.date(), now.time().min) # floor the time
 
 sod = (now - now_normalized).total_seconds()
 print(now)
-# 2021-10-17 14:05:15 
+# 2021-10-17 14:05:15
 print(f"seconds passed since {now_normalized}: {sod}")
 # seconds passed since 2021-10-17 00:00:00: 50715.0
 ```
@@ -340,10 +340,10 @@ A "normal" day has 24 hours, a "normal" week has 7 days - but what about months?
 
 ### Useful packages etc.
 - [dateutil](https://github.com/dateutil/dateutil) - powerful extension to the standard lib's `datetime`, for example with a great universal [parser](https://dateutil.readthedocs.io/en/stable/parser.html), [relativedelta](https://dateutil.readthedocs.io/en/stable/relativedelta.html) and more.
-- [tzlocal](https://github.com/regebro/tzlocal) - tries to figure out what your local timezone is.
+- [tzlocal](https://github.com/regebro/tzlocal) - tries to figure out what your local time zone is.
 - [timezonefinder](https://github.com/jannikmi/timezonefinder) - finds the time zone at any point on earth (offline).
 - [eggert/tz](https://github.com/eggert/tz) - Paul Eggert's time zone database, if you want to dive into time zone rules.
-- [whereareyou](https://github.com/MrFuppes/whenareyou) - use nominatim.openstreetmap.org to find the time zone of a given location name (e.g. a city).
+- [whereareyou](https://github.com/MrFuppes/whenareyou) - use [nominatim.openstreetmap.org](https://nominatim.openstreetmap.org/ui/search.html) to find the time zone of a given location name (e.g. a city).
 
 ---
 
