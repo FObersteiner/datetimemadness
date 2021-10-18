@@ -1,7 +1,7 @@
 # A 2021 tour of datetime, time zones and timedelta in Python
 > ***if you don't set a time zone, it's local time!***
 
-This manuscript gives a quick tour of how to handle date/time, time zones and durations in Python 3.9 and higher. It gives you an overview of what you can do and what tools there are. And of course helps you to avoid the common pitfalls I've encountered personally and in many questions around the subject on [stackoverflow](https://stackoverflow.com/).
+This manuscript gives a quick tour of how to handle date/time, time zones and durations in Python 3.9 and higher. It gives you an overview of what you can do and what tools there are. And of course should help you to avoid the common pitfalls I've encountered personally and in many questions around the subject on [stackoverflow](https://stackoverflow.com/).
 
 
 
@@ -50,12 +50,12 @@ print(now_utc)
 print(repr(now_utc))
 # datetime.datetime(2021, 10, 5, 17, 32, 4, 898176, tzinfo=datetime.timezone.utc)
 ```
-But before we dive into time zones, let's discuss how you get a `datetime` object from a string of characters. And of course the other way around, how you can get a string that shows date and time in a certain format.
+Now you have *Coordinated Universal Time* or [UTC](https://en.wikipedia.org/wiki/Coordinated_Universal_Time), as the `tzinfo` attribute tells (`tzinfo=datetime.timezone.utc`). But before we dive into time zones, let's discuss how you get a `datetime` object from a string of characters. And of course the other way around, how you can get a string that shows date and time in a certain format.
 
 ---
 
 ### From string
-It is pretty common to store date/time as a string. In Python, you **p**arse a string to a `datetime` object with the [str**p**time](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior) method, and you create a string that shows date/time in a certain **f**ormat with the [str**f**time](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior) method. To be precise with wording, only the text in a string can have a certain *format*, not the `datetime` object itself since it's a data structure.
+It is pretty common to store date/time as a string. In Python, you **p**arse a string to a datetime object with the [str**p**time](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior) method, and you create a string that shows date/time in a certain **f**ormat with the [str**f**time](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior) method. To be precise with wording, only the text in a string can have a certain *format*, not the datetime object itself since it's a data structure.
 
 To get a string converted to datetime, just tell the computer what to do by selecting from [strftime() and strptime() Format Codes](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes):
 ```Python
@@ -68,8 +68,7 @@ print(repr(dt))
 s = "9:15 PM"
 dt = datetime.strptime(s, "%I:%M %p")
 print(repr(dt))
-# datetime.datetime(1900, 1, 1, 21, 15)
-# -> note that a default date was added
+# datetime.datetime(1900, 1, 1, 21, 15) # -> note that a default date was added
 ```
 All units of date and time have to be matched by a directive `%...` while all other characters have to be exactly as in the input. For example
 ```Python
@@ -96,8 +95,16 @@ print(repr(dt))
 # datetime.datetime(1970, 1, 1, 12, 18, tzinfo=datetime.timezone.utc)
 ```
 
+***What about 'Z' for UTC?***
+Python's `fromisoformat` doesn't seem to like that so far, but there is [a work-around](https://stackoverflow.com/a/62769371/10197418):
+```Python
+s = "2008-09-03T20:56:35.450686Z"
+datetime.fromisoformat(s.replace('Z', '+00:00'))
+# datetime.datetime(2008, 9, 3, 20, 56, 35, 450686, tzinfo=datetime.timezone.utc)
+```
+or just use `strptime` with the `%z` directive; `datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%f%z')`.
 
-***Pitfall: %Z vs. UTC or GMT***
+***Pitfall: %Z vs. UTC/GMT***
 
 There is a parsing directive `%Z` (capital letter Z) that can make `strptime` accept `"GMT"` and `"UTC"`. However, the information ("this date/time is in UTC") is actually ignored:
 ```Python
@@ -114,19 +121,19 @@ dt = datetime.strptime(s.replace("GMT", "+00:00"), "%m.%d.%Y %I:%M %p %z")
 print(repr(dt))
 # datetime.datetime(1986, 10, 14, 21, 15, tzinfo=datetime.timezone.utc)
 ```
-`%Z`still is kind of useful if your input specifies a UTC offset. You can use a combination of `%Z%z` e.g. in
+`%Z` still is kind of useful if your input specifies a UTC offset. You can use a combination of `%Z%z` e.g. in
 ```Python
 s = "10.14.1986 9:15 PM GMT+02:00"
 dt = datetime.strptime(s, "%m.%d.%Y %I:%M %p %Z%z")
 print(repr(dt))
 # datetime.datetime(1986, 10, 14, 21, 15, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'GMT'))
 ```
-A parsing directive of `"%m.%d.%Y %I:%M %p GMT%z"` would have worked as well though, the tzinfo attribute just wouldn't have a name then.
+A parsing directive of `"%m.%d.%Y %I:%M %p GMT%z"` would have worked as well though, the `tzinfo` attribute just wouldn't have a name then.
 
 ---
 
 ### ...and to string
-Same directives work the other way around. Just tell the computer what to do, e.g.
+Same directives work the other way around. Just tell the computer exactly what to do, e.g.
 ```Python
 print("the current time is", datetime.now().strftime("%I:%M %p"))
 # the current time is 07:47 pm
@@ -147,7 +154,7 @@ print(datetime.now(timezone.utc).isoformat(timespec="milliseconds"))
 ### Setting time zones and converting between them
 The intro section already shows how to set UTC. What about other time zones?
 
-With Python version 3.9 we have [zoneinfo](https://docs.python.org/3/library/zoneinfo.html) in the standard library to handle those. Just specify a time zone name from the [IANA tz database](https://www.iana.org/time-zones) (Wikipedia has [an overview](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)):
+Python version 3.9 has [zoneinfo](https://docs.python.org/3/library/zoneinfo.html) in the standard library to handle those. Just specify a time zone name from the [IANA tz database](https://www.iana.org/time-zones) (Wikipedia has [an overview](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)):
 
 ```Python
 from datetime import datetime
