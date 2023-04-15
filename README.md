@@ -1,8 +1,7 @@
-# A 2021 tour of datetime, time zones and timedelta in Python
+# A tour of datetime, time zones and timedelta in Python
 > ***if you don't set a time zone, it's local time!***
 
-This manuscript gives a quick tour of how to handle date/time, time zones and durations in Python 3.9 and higher. It gives you an overview of what you can do and what tools there are. And of course should help you to avoid the common pitfalls I've encountered personally and in many questions around the subject on [stackoverflow](https://stackoverflow.com/).
-
+This manuscript gives a tour of how to handle date/time, time zones and durations in Python. It's focused on Python version 3.9 and higher.
 
 
 ### Overview
