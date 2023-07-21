@@ -9,7 +9,8 @@ from datetime import datetime, timezone
 
 # on some systems, the locale needs to be set; we use English here
 import locale
-locale.setlocale(locale.LC_TIME, 'en_GB.utf8')
+
+locale.setlocale(locale.LC_TIME, "en_GB.utf8")
 # locale string (2nd parameter) is platform-specific !
 
 
@@ -36,7 +37,6 @@ except ValueError as e:
     # time data '10.14.1986' does not match format '%m/%d/%Y'
 
 
-
 # -----------------------------------------------------------------------------
 # ISO format (ISO8601)
 
@@ -50,7 +50,6 @@ s = "1970-01-01T12:18:00+00:00"
 dt = datetime.fromisoformat(s)
 print(repr(dt))
 # datetime.datetime(1970, 1, 1, 12, 18, tzinfo=datetime.timezone.utc)
-
 
 
 # -----------------------------------------------------------------------------
@@ -68,7 +67,9 @@ print(repr(dt))
 # datetime.datetime(1986, 10, 14, 21, 15, tzinfo=datetime.timezone.utc)
 
 s = "10.14.1986 9:15 PM GMT+02:00"
-dt = datetime.strptime(s, "%m.%d.%Y %I:%M %p %Z%z") # datetime.strptime(s, "%m.%d.%Y %I:%M %p GMT%z")
+dt = datetime.strptime(
+    s, "%m.%d.%Y %I:%M %p %Z%z"
+)  # datetime.strptime(s, "%m.%d.%Y %I:%M %p GMT%z")
 print(repr(dt))
 # datetime.datetime(1986, 10, 14, 21, 15, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'GMT'))
 

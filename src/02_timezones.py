@@ -8,7 +8,7 @@ Created on Tue Oct  5 20:05:01 2021
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-now_Pacific = datetime.now(ZoneInfo('America/Los_Angeles'))
+now_Pacific = datetime.now(ZoneInfo("America/Los_Angeles"))
 print(f"current Pacific time: {now_Pacific.isoformat(timespec='seconds')}")
 # current Pacific time: 2021-10-17T01:19:22-07:00
 
@@ -32,8 +32,7 @@ print(f"winter time: {winter.isoformat()}")
 # winter time: 2021-11-01T00:00:00+01:00
 
 
-
-naive = datetime(2021, 10, 17) # this should be in time zone Europe/Berlin...
+naive = datetime(2021, 10, 17)  # this should be in time zone Europe/Berlin...
 print(naive)
 # 2021-10-17 00:00:00
 aware = naive.replace(tzinfo=ZoneInfo("Europe/Berlin"))

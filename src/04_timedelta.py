@@ -18,8 +18,8 @@ duration = datetime(2020, 1, 1, 15) - datetime(2020, 1, 1, 14)
 print(duration, duration.total_seconds())
 # 1:00:00 3600.0
 
-now = datetime.now().replace(microsecond=0) # remove microseconds for clarity
-now_normalized = datetime.combine(now.date(), now.time().min) # floor the time
+now = datetime.now().replace(microsecond=0)  # remove microseconds for clarity
+now_normalized = datetime.combine(now.date(), now.time().min)  # floor the time
 
 sod = (now - now_normalized).total_seconds()
 print(now)
@@ -38,12 +38,12 @@ from zoneinfo import ZoneInfo
 summer = datetime(2021, 10, 30, tzinfo=ZoneInfo("Europe/Berlin"))
 winter = datetime(2021, 11, 1, tzinfo=ZoneInfo("Europe/Berlin"))
 
-print(winter-summer)
+print(winter - summer)
 # 2 days, 0:00:00
 
 UTC = ZoneInfo("UTC")
 utc_summer, utc_winter = summer.astimezone(UTC), winter.astimezone(UTC)
-print(utc_winter-utc_summer)
+print(utc_winter - utc_summer)
 # 2 days, 1:00:00
 
 
@@ -55,10 +55,11 @@ def strftimedelta(td: timedelta) -> str:
     microseconds are ignored
     """
     total = td.total_seconds()
-    prefix, total = ('-', total*-1) if total < 0 else ('', total)
+    prefix, total = ("-", total * -1) if total < 0 else ("", total)
     h, r = divmod(total, 3600)
     m, s = divmod(r, 60)
     return f"{prefix}{int(h):02d}:{int(m):02d}:{int(s):02d}"
+
 
 for td in timedelta(1), timedelta(-1), timedelta(days=1.5, microseconds=500):
     print(strftimedelta(td))
@@ -73,12 +74,13 @@ def strptimedelta(tdstr: str) -> timedelta:
     strftimedelta parses a timedelta string to a timedelta object.
     input format is [+- days](HH:MM:SS)[.f]
     """
-    parts = tdstr.strip(' ').split(' ')
-    d = 0 if len(parts) == 1 else int(parts[0]) # days specified?
-    if len(parts) > 1: # we have days specified
+    parts = tdstr.strip(" ").split(" ")
+    d = 0 if len(parts) == 1 else int(parts[0])  # days specified?
+    if len(parts) > 1:  # we have days specified
         d = int(parts[0])
-    s = sum(x*y for x, y in zip(map(float, parts[-1].split(':')), (3600, 60, 1)))
-    return timedelta(seconds=(s + d*86400))
+    s = sum(x * y for x, y in zip(map(float, parts[-1].split(":")), (3600, 60, 1)))
+    return timedelta(seconds=(s + d * 86400))
+
 
 for td in timedelta(1), timedelta(-1), timedelta(days=1.5, microseconds=500):
     # output must match input
