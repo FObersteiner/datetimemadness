@@ -32,7 +32,7 @@ now = datetime.now()
 print(now) # prints the string representation of the datetime object
 # 2021-10-05 19:32:04.898003
 ```
-`now` is what you would see on your "wall clock" (i.e. your computer's clock display), although it probably doesn't show microseconds.
+`now` is what you would see on your "wall clock" (i.e. your computer's clock display), although that one probably doesn't show microseconds.
 
 If you inspect closer,
 ```Python
