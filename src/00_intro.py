@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Oct  5 19:29:34 2021
-
-@author: flonblnx
-"""
 from datetime import datetime
 
 now = datetime.now()
@@ -20,7 +15,7 @@ print(repr(now))
 # datetime.datetime(2021, 10, 5, 19, 32, 4, 898003)
 
 
-from datetime import timezone
+from datetime import timezone  # noqa
 
 now_utc = datetime.now(timezone.utc)
 print(now_utc)

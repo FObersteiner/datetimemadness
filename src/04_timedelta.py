@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Oct  5 20:08:18 2021
-
-@author: flonblnx
-"""
 from datetime import datetime, timedelta
 
 duration = timedelta(hours=1, minutes=30)
@@ -33,7 +28,7 @@ print(dt)
 # 2021-10-17 14:05:15
 
 
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo  # noqa
 
 summer = datetime(2021, 10, 30, tzinfo=ZoneInfo("Europe/Berlin"))
 winter = datetime(2021, 11, 1, tzinfo=ZoneInfo("Europe/Berlin"))

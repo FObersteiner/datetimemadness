@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Oct  5 19:33:04 2021
-
-@author: flonblnx
-"""
-from datetime import datetime, timezone
-
 # on some systems, the locale needs to be set; we use English here
 import locale
+from datetime import datetime, timezone
 
 locale.setlocale(locale.LC_TIME, "en_GB.utf8")
 # locale string (2nd parameter) is platform-specific !

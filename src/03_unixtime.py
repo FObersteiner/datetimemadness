@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Oct  5 20:07:11 2021
-
-@author: flonblnx
-"""
 from datetime import datetime, timezone
 
 now_utc = datetime.now(timezone.utc)
